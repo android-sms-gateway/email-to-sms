@@ -8,7 +8,8 @@ require (
 	github.com/go-core-fx/healthfx v0.0.2-0.20260109013230-f7729a0a06bc
 	github.com/go-core-fx/logger v0.0.1
 	github.com/go-core-fx/telegofx v0.0.1
-	github.com/gofiber/fiber/v2 v2.52.12
+	github.com/go-playground/validator/v10 v10.28.0
+	github.com/gofiber/fiber/v2 v2.52.13
 	github.com/mymmrac/telego v1.7.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/samber/lo v1.52.0
@@ -40,7 +41,6 @@ require (
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.28.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/gofiber/contrib/fiberzap/v2 v2.1.6 // indirect
 	github.com/gofiber/swagger v1.1.1 // indirect
