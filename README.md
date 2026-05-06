@@ -11,21 +11,21 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/capcom6/go-project-template">
+  <a href="https://github.com/android-sms-gateway/email-to-sms">
     <img src="https://raw.githubusercontent.com/golang-samples/gopher-vector/master/gopher.png" alt="Logo" width="120" height="120">
   </a>
 
-<h3 align="center">go-project-template</h3>
+  <h3 align="center">Email-to-SMS Bridge</h3>
 
   <p align="center">
-    Opinionated Go service template with Fiber API, OpenAPI docs, Telegram bot wiring, health endpoints, and Fx-based modular DI.
+    A standalone SMTP server that receives emails and forwards them as SMS messages via the SMSGate platform.
     <br />
-    <a href="https://github.com/capcom6/go-project-template"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/android-sms-gateway/email-to-sms"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/capcom6/go-project-template/issues">Report Bug</a>
+    <a href="https://github.com/android-sms-gateway/email-to-sms/issues">Report Bug</a>
     ·
-    <a href="https://github.com/capcom6/go-project-template/issues">Request Feature</a>
+    <a href="https://github.com/android-sms-gateway/email-to-sms/issues">Request Feature</a>
   </p>
 </div>
 
@@ -33,10 +33,9 @@
 
 <!-- TABLE OF CONTENTS -->
 - [About The Project](#about-the-project)
+  - [Use Case](#use-case)
   - [Built With](#built-with)
 - [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
 - [Usage](#usage)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -49,15 +48,23 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This repository is a production-oriented starter for backend services in Go. It ships with:
+The Email-to-SMS Bridge is a standalone SMTP server that receives emails and forwards them as SMS messages via the SMSGate Android gateway.
 
-* HTTP server bootstrapped with Fiber and dependency injection via Uber Fx.
-* Version + health endpoints using `healthfx`.
-* Swagger/OpenAPI docs endpoint under `/api/v1/docs`.
-* Telegram bot integration (`/start` command handler included).
-* Modular business domain example to plug in real use-cases.
+This service acts as a bridge between email-based notification systems and SMS delivery, allowing booking systems, appointment schedulers, and other applications to send SMS notifications through a simple email interface.
 
-Use this template when you want a fast path to shipping APIs and bot workflows with a clean module layout.
+### Use Case
+
+Applications that already send email notifications can easily add SMS delivery by sending emails to this bridge:
+
+```
+Booking System → Email → Email-to-SMS Bridge → SMSGate → Android Device → SMS
+```
+
+Emails are sent in the format: `79991234567@sms-gateway.local`
+
+- **Local part (before @):** Phone number in any format
+- **Body:** SMS message content
+- **Authentication:** SMTP AUTH credentials are passed through to SMSGate for per-user authentication
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -65,10 +72,6 @@ Use this template when you want a fast path to shipping APIs and bot workflows w
 ### Built With
 
 * [![Go][go-shield]][go-url]
-* [![Fiber][fiber-shield]][fiber-url]
-* [![Fx][fx-shield]][fx-url]
-* [![Swagger][swagger-shield]][swagger-url]
-* [![Telegram][telegram-shield]][telegram-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -77,42 +80,7 @@ Use this template when you want a fast path to shipping APIs and bot workflows w
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Follow these steps to run the service locally.
-
-### Prerequisites
-
-* Go 1.25+
-  ```sh
-  go version
-  ```
-* `golangci-lint` (optional but recommended)
-  ```sh
-  golangci-lint version
-  ```
-* `swag` CLI for docs generation
-  ```sh
-  go install github.com/swaggo/swag/cmd/swag@latest
-  ```
-
-### Installation
-
-1. Clone the repo.
-   ```sh
-   git clone https://github.com/capcom6/go-project-template.git
-   cd go-project-template
-   ```
-2. Download dependencies.
-   ```sh
-   make deps
-   ```
-3. (Optional) Generate OpenAPI docs.
-   ```sh
-   make gen
-   ```
-4. Build the binary.
-   ```sh
-   make build
-   ```
+WIP
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -121,42 +89,7 @@ Follow these steps to run the service locally.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Run the app:
-
-```sh
-go run .
-```
-
-Or use live reload:
-
-```sh
-make air
-```
-
-Default server address is `127.0.0.1:3000`.
-
-Helpful endpoints:
-
-* Health endpoints (via `healthfx`), typically under `/health`.
-* OpenAPI docs: `http://127.0.0.1:3000/api/v1/docs`.
-
-Configuration:
-
-* Environment variables are loaded via `go-core-fx/config`.
-* You can point to a YAML file using:
-  ```sh
-  export CONFIG_PATH=./config.local.yaml
-  ```
-* Telegram token is configured via the app config (`telegram.token`) and required to use bot handlers.
-
-Quality checks:
-
-```sh
-make fmt
-make lint
-make test
-make coverage
-```
+WIP
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -165,14 +98,13 @@ make coverage
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Fiber API scaffold
-- [x] OpenAPI + Swagger integration
-- [x] Telegram bot wiring
-- [ ] Database module integration
-- [ ] Auth middleware and RBAC
-- [ ] CI release pipeline hardening
+- [x] Project initialization
+- [ ] SMTP server implementation
+- [ ] Email parsing
+- [ ] SMS sending integration
+- [ ] Docker support
 
-See the [open issues](https://github.com/capcom6/go-project-template/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/android-sms-gateway/email-to-sms/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -210,7 +142,7 @@ Distributed under the Apache 2.0 License. See `LICENSE` for more information.
 
 Maintainer: [@capcom6](https://github.com/capcom6)
 
-Project Link: [https://github.com/capcom6/go-project-template](https://github.com/capcom6/go-project-template)
+Project Link: [https://github.com/android-sms-gateway/email-to-sms](https://github.com/android-sms-gateway/email-to-sms)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -219,10 +151,8 @@ Project Link: [https://github.com/capcom6/go-project-template](https://github.co
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [Best README Template](https://github.com/othneildrew/Best-README-Template)
-* [Go Fiber](https://github.com/gofiber/fiber)
-* [Uber Fx](https://github.com/uber-go/fx)
-* [Telego](https://github.com/mymmrac/telego)
+* [SMSGate Platform](https://sms-gate.app)
+* [Go](https://go.dev/)
 * [Shields.io](https://shields.io)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -230,23 +160,15 @@ Project Link: [https://github.com/capcom6/go-project-template](https://github.co
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/capcom6/go-project-template.svg?style=for-the-badge
-[contributors-url]: https://github.com/capcom6/go-project-template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/capcom6/go-project-template.svg?style=for-the-badge
-[forks-url]: https://github.com/capcom6/go-project-template/network/members
-[stars-shield]: https://img.shields.io/github/stars/capcom6/go-project-template.svg?style=for-the-badge
-[stars-url]: https://github.com/capcom6/go-project-template/stargazers
-[issues-shield]: https://img.shields.io/github/issues/capcom6/go-project-template.svg?style=for-the-badge
-[issues-url]: https://github.com/capcom6/go-project-template/issues
-[license-shield]: https://img.shields.io/github/license/capcom6/go-project-template.svg?style=for-the-badge
-[license-url]: https://github.com/capcom6/go-project-template/blob/master/LICENSE
-[go-shield]: https://img.shields.io/badge/go-1.25%2B-00ADD8?style=for-the-badge&logo=go
+[contributors-shield]: https://img.shields.io/github/contributors/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[contributors-url]: https://github.com/android-sms-gateway/email-to-sms/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[forks-url]: https://github.com/android-sms-gateway/email-to-sms/network/members
+[stars-shield]: https://img.shields.io/github/stars/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[stars-url]: https://github.com/android-sms-gateway/email-to-sms/stargazers
+[issues-shield]: https://img.shields.io/github/issues/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[issues-url]: https://github.com/android-sms-gateway/email-to-sms/issues
+[license-shield]: https://img.shields.io/github/license/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[license-url]: https://github.com/android-sms-gateway/email-to-sms/blob/master/LICENSE
+[go-shield]: https://img.shields.io/badge/go-1.21%2B-00ADD8?style=for-the-badge&logo=go
 [go-url]: https://go.dev/
-[fiber-shield]: https://img.shields.io/badge/Fiber-v2-00b894?style=for-the-badge
-[fiber-url]: https://github.com/gofiber/fiber
-[fx-shield]: https://img.shields.io/badge/Uber%20Fx-DI-6f42c1?style=for-the-badge
-[fx-url]: https://github.com/uber-go/fx
-[swagger-shield]: https://img.shields.io/badge/OpenAPI-Swagger-85EA2D?style=for-the-badge
-[swagger-url]: https://github.com/swaggo/swag
-[telegram-shield]: https://img.shields.io/badge/Telegram-Bot-26A5E4?style=for-the-badge&logo=telegram
-[telegram-url]: https://core.telegram.org/bots

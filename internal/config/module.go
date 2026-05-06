@@ -1,10 +1,9 @@
 package config
 
 import (
-	"github.com/capcom6/go-project-template/internal/example"
+	"github.com/android-sms-gateway/email-to-sms/internal/example"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/fiberfx/openapi"
-	"github.com/go-core-fx/telegofx"
 	"go.uber.org/fx"
 )
 
@@ -25,11 +24,6 @@ func Module() fx.Option {
 					Enabled:    cfg.HTTP.OpenAPI.Enabled,
 					PublicHost: cfg.HTTP.OpenAPI.PublicHost,
 					PublicPath: cfg.HTTP.OpenAPI.PublicPath,
-				}
-			},
-			func(cfg Config) telegofx.Config {
-				return telegofx.Config{
-					Token: cfg.Telegram.Token,
 				}
 			},
 		),

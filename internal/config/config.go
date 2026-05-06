@@ -21,17 +21,12 @@ type openAPIConfig struct {
 	PublicPath string `koanf:"public_path"`
 }
 
-type telegram struct {
-	Token string `koanf:"token"`
-}
-
 type exampleConfig struct {
 	Example string `koanf:"example"`
 }
 
 type Config struct {
-	HTTP     http     `koanf:"http"`
-	Telegram telegram `koanf:"telegram"`
+	HTTP http `koanf:"http"`
 
 	Example exampleConfig `koanf:"example"`
 }
@@ -47,10 +42,6 @@ func Default() Config {
 				PublicHost: "",
 				PublicPath: "",
 			},
-		},
-
-		Telegram: telegram{
-			Token: "",
 		},
 
 		Example: exampleConfig{
