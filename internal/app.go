@@ -6,10 +6,10 @@ import (
 	"github.com/android-sms-gateway/email-to-sms/internal/config"
 	"github.com/android-sms-gateway/email-to-sms/internal/example"
 	"github.com/android-sms-gateway/email-to-sms/internal/server"
+	"github.com/android-sms-gateway/email-to-sms/internal/smtp"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/healthfx"
 	"github.com/go-core-fx/logger"
-	"github.com/go-core-fx/telegofx"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -32,7 +32,7 @@ func Run(version healthfx.Version) {
 		// openrouterfx.Module(),
 		// redisfx.Module(),
 		// sqlxfx.Module(),
-		telegofx.Module(true),
+		// telegofx.Module(true),
 		// validatorfx.Module(),
 		// watermillfx.Module(),
 		//
@@ -44,7 +44,9 @@ func Run(version healthfx.Version) {
 		// BUSINESS MODULES
 		fx.Supply(version),
 		example.Module(),
+		smtp.Module(),
 		//
+		fx.Provide(smtp.NewNopHandler),
 		fx.Invoke(func(lc fx.Lifecycle, logger *zap.Logger) {
 			lc.Append(fx.Hook{
 				OnStart: func(_ context.Context) error {

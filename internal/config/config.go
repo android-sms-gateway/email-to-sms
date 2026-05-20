@@ -25,13 +25,23 @@ type exampleConfig struct {
 	Example string `koanf:"example"`
 }
 
-type Config struct {
-	HTTP http `koanf:"http"`
+type smtpConfig struct {
+	Host    string `koanf:"host"`
+	Port    int    `koanf:"port"`
+	Domain  string `koanf:"domain"`
+	TLSCert string `koanf:"tls_cert"`
+	TLSKey  string `koanf:"tls_key"`
+}
 
+type Config struct {
+	HTTP    http          `koanf:"http"`
 	Example exampleConfig `koanf:"example"`
+	SMTP    smtpConfig    `koanf:"smtp"`
 }
 
 func Default() Config {
+	const defaultSMTPPort = 587
+
 	return Config{
 		HTTP: http{
 			Address:     "127.0.0.1:3000",
@@ -46,6 +56,14 @@ func Default() Config {
 
 		Example: exampleConfig{
 			Example: "example",
+		},
+
+		SMTP: smtpConfig{
+			Host:    "127.0.0.1",
+			Port:    defaultSMTPPort,
+			Domain:  "example.com",
+			TLSCert: "",
+			TLSKey:  "",
 		},
 	}
 }
