@@ -242,6 +242,7 @@ linters:
       # Default: []
       exclude:
         # std libs
+        - ^crypto/tls.Config$
         - ^net.ListenConfig$
         - ^net/http.Client$
         - ^net/http.Cookie$
