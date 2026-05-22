@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/android-sms-gateway/email-to-sms/internal/example"
+	"github.com/android-sms-gateway/email-to-sms/internal/smsgate"
 	"github.com/android-sms-gateway/email-to-sms/internal/smtp"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/fiberfx/openapi"
@@ -41,6 +42,13 @@ func Module() fx.Option {
 				TLSCert: cfg.SMTP.TLSCert,
 				TLSKey:  cfg.SMTP.TLSKey,
 			}
-		}),
+		},
+			func(cfg Config) smsgate.Config {
+				return smsgate.Config{
+					URL:                 cfg.SMSGate.URL,
+					SkipPhoneValidation: cfg.SMSGate.SkipPhoneValidation,
+				}
+			},
+		),
 	)
 }

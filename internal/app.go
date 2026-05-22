@@ -6,6 +6,7 @@ import (
 	"github.com/android-sms-gateway/email-to-sms/internal/config"
 	"github.com/android-sms-gateway/email-to-sms/internal/example"
 	"github.com/android-sms-gateway/email-to-sms/internal/server"
+	"github.com/android-sms-gateway/email-to-sms/internal/smsgate"
 	"github.com/android-sms-gateway/email-to-sms/internal/smtp"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/healthfx"
@@ -45,6 +46,7 @@ func Run(version healthfx.Version) {
 		fx.Supply(version),
 		example.Module(),
 		smtp.Module(),
+		smsgate.Module(),
 		//
 		fx.Provide(smtp.NewNopHandler),
 		fx.Invoke(func(lc fx.Lifecycle, logger *zap.Logger) {

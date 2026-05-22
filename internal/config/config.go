@@ -33,10 +33,16 @@ type smtpConfig struct {
 	TLSKey  string `koanf:"tls_key"`
 }
 
+type smsgateConfig struct {
+	URL                 string `koanf:"url"`
+	SkipPhoneValidation bool   `koanf:"skip_phone_validation"`
+}
+
 type Config struct {
 	HTTP    http          `koanf:"http"`
 	Example exampleConfig `koanf:"example"`
 	SMTP    smtpConfig    `koanf:"smtp"`
+	SMSGate smsgateConfig `koanf:"smsgate"`
 }
 
 func Default() Config {
@@ -64,6 +70,11 @@ func Default() Config {
 			Domain:  "example.com",
 			TLSCert: "",
 			TLSKey:  "",
+		},
+
+		SMSGate: smsgateConfig{
+			URL:                 "https://api.sms-gate.app/3rdparty/v1",
+			SkipPhoneValidation: false,
 		},
 	}
 }
