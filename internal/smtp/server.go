@@ -23,6 +23,7 @@ func NewServer(cfg Config, h Handler, logger *zap.Logger) (*Server, error) {
 	}
 
 	srv := gosmtp.NewServer(b)
+	srv.AllowInsecureAuth = true
 	srv.Addr = fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 
 	if cfg.TLSCert != "" && cfg.TLSKey != "" {
