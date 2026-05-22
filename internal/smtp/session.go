@@ -7,6 +7,7 @@ import (
 	"net/mail"
 	"strings"
 
+	sasl "github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
 	"go.uber.org/zap"
 )
@@ -22,11 +23,21 @@ type session struct {
 	to       string
 }
 
-// AuthPlain handles SMTP AUTH PLAIN authentication.
-func (s *session) AuthPlain(username, password string) error {
-	s.username = username
-	s.password = password
-	return nil
+// Auth implements [smtp.AuthSession].
+func (s *session) Auth(mech string) (sasl.Server, error) {
+	if mech != "PLAIN" {
+		return nil, smtp.ErrAuthUnsupported
+	}
+	return sasl.NewPlainServer(func(_, username, password string) error {
+		s.username = username
+		s.password = password
+		return nil
+	}), nil
+}
+
+// AuthMechanisms implements [smtp.AuthSession].
+func (s *session) AuthMechanisms() []string {
+	return []string{"PLAIN"}
 }
 
 // Mail handles the MAIL FROM command.
@@ -107,3 +118,6 @@ func (s *session) Logout() error {
 	s.Reset()
 	return nil
 }
+
+var _ smtp.Session = (*session)(nil)
+var _ smtp.AuthSession = (*session)(nil)
