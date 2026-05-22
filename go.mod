@@ -3,6 +3,7 @@ module github.com/android-sms-gateway/email-to-sms
 go 1.25.7
 
 require (
+	github.com/android-sms-gateway/client-go v1.12.9
 	github.com/emersion/go-smtp v0.24.0
 	github.com/go-core-fx/config v0.1.0
 	github.com/go-core-fx/fiberfx v0.5.0
