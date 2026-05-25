@@ -4,6 +4,7 @@ go 1.25.7
 
 require (
 	github.com/android-sms-gateway/client-go v1.12.9
+	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6
 	github.com/emersion/go-smtp v0.24.0
 	github.com/go-core-fx/config v0.1.0
 	github.com/go-core-fx/fiberfx v0.5.0
@@ -24,7 +25,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/go-core-fx/fxutil v0.0.2 // indirect
