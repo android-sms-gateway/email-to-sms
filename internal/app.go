@@ -3,8 +3,8 @@ package internal
 import (
 	"context"
 
+	"github.com/android-sms-gateway/email-to-sms/internal/bridge"
 	"github.com/android-sms-gateway/email-to-sms/internal/config"
-	"github.com/android-sms-gateway/email-to-sms/internal/example"
 	"github.com/android-sms-gateway/email-to-sms/internal/server"
 	"github.com/android-sms-gateway/email-to-sms/internal/smsgate"
 	"github.com/android-sms-gateway/email-to-sms/internal/smtp"
@@ -44,11 +44,10 @@ func Run(version healthfx.Version) {
 		//
 		// BUSINESS MODULES
 		fx.Supply(version),
-		example.Module(),
-		smtp.Module(),
 		smsgate.Module(),
+		bridge.Module(),
+		smtp.Module(),
 		//
-		fx.Provide(smtp.NewNopHandler),
 		fx.Invoke(func(lc fx.Lifecycle, logger *zap.Logger) {
 			lc.Append(fx.Hook{
 				OnStart: func(_ context.Context) error {
