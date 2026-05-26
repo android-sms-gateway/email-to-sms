@@ -21,10 +21,6 @@ type openAPIConfig struct {
 	PublicPath string `koanf:"public_path"`
 }
 
-type exampleConfig struct {
-	Example string `koanf:"example"`
-}
-
 type smtpConfig struct {
 	Host    string `koanf:"host"`
 	Port    int    `koanf:"port"`
@@ -40,7 +36,6 @@ type smsgateConfig struct {
 
 type Config struct {
 	HTTP    http          `koanf:"http"`
-	Example exampleConfig `koanf:"example"`
 	SMTP    smtpConfig    `koanf:"smtp"`
 	SMSGate smsgateConfig `koanf:"smsgate"`
 }
@@ -59,11 +54,6 @@ func Default() Config {
 				PublicPath: "",
 			},
 		},
-
-		Example: exampleConfig{
-			Example: "example",
-		},
-
 		SMTP: smtpConfig{
 			Host:    "127.0.0.1",
 			Port:    defaultSMTPPort,
@@ -71,7 +61,6 @@ func Default() Config {
 			TLSCert: "",
 			TLSKey:  "",
 		},
-
 		SMSGate: smsgateConfig{
 			URL:                 "https://api.sms-gate.app/3rdparty/v1",
 			SkipPhoneValidation: false,

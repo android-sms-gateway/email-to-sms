@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/android-sms-gateway/email-to-sms/internal/example"
 	"github.com/android-sms-gateway/email-to-sms/internal/smsgate"
 	"github.com/android-sms-gateway/email-to-sms/internal/smtp"
 	"github.com/go-core-fx/fiberfx"
@@ -29,20 +28,16 @@ func Module() fx.Option {
 				}
 			},
 		),
-		fx.Provide(func(cfg Config) example.Config {
-			return example.Config{
-				Example: cfg.Example.Example,
-			}
-		}),
-		fx.Provide(func(cfg Config) smtp.Config {
-			return smtp.Config{
-				Host:    cfg.SMTP.Host,
-				Port:    cfg.SMTP.Port,
-				Domain:  cfg.SMTP.Domain,
-				TLSCert: cfg.SMTP.TLSCert,
-				TLSKey:  cfg.SMTP.TLSKey,
-			}
-		},
+		fx.Provide(
+			func(cfg Config) smtp.Config {
+				return smtp.Config{
+					Host:    cfg.SMTP.Host,
+					Port:    cfg.SMTP.Port,
+					Domain:  cfg.SMTP.Domain,
+					TLSCert: cfg.SMTP.TLSCert,
+					TLSKey:  cfg.SMTP.TLSKey,
+				}
+			},
 			func(cfg Config) smsgate.Config {
 				return smsgate.Config{
 					URL:                 cfg.SMSGate.URL,
