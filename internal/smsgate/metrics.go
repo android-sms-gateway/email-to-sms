@@ -15,6 +15,7 @@ type Metrics struct {
 	sentTotal    prometheus.Counter
 	failedTotal  prometheus.Counter
 	authFailures prometheus.Counter
+	apiDuration  *prometheus.HistogramVec
 }
 
 // NewMetrics creates and initializes metrics collectors.
@@ -38,6 +39,13 @@ func NewMetrics() *Metrics {
 			Name:      "auth_failed_total",
 			Help:      "Total number of SMSGate authentication failures",
 		}),
+		apiDuration: promauto.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystem,
+			Name:      "api_duration_seconds",
+			Help:      "Duration of SMSGate API calls",
+			Buckets:   []float64{0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10},
+		}, []string{"error_type"}),
 	}
 }
 
@@ -54,4 +62,9 @@ func (m *Metrics) IncFailed() {
 // IncAuthFailures increments authentication failures counter.
 func (m *Metrics) IncAuthFailures() {
 	m.authFailures.Inc()
+}
+
+// ObserveAPIDuration records the SMSGate API call latency with the error type label.
+func (m *Metrics) ObserveAPIDuration(seconds float64, errorType string) {
+	m.apiDuration.WithLabelValues(errorType).Observe(seconds)
 }
