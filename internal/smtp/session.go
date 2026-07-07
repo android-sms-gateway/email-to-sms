@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/mail"
 	"strings"
+	"time"
 
 	sasl "github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
@@ -15,12 +16,14 @@ import (
 // session handles a single SMTP connection.
 type session struct {
 	backend *backend
+	metrics *Metrics
 	logger  *zap.Logger
 
-	username string
-	password string
-	from     string
-	to       string
+	username  string
+	password  string
+	from      string
+	to        string
+	startTime time.Time
 }
 
 // Auth implements [smtp.AuthSession].
@@ -115,6 +118,8 @@ func (s *session) Reset() {
 
 // Logout handles session cleanup.
 func (s *session) Logout() error {
+	s.metrics.DecActiveConnections()
+	s.metrics.ObserveSessionDuration(time.Since(s.startTime).Seconds())
 	s.Reset()
 	return nil
 }

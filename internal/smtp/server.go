@@ -15,10 +15,11 @@ type Server struct {
 }
 
 // NewServer creates and configures the SMTP server.
-func NewServer(cfg Config, h Handler, logger *zap.Logger) (*Server, error) {
+func NewServer(cfg Config, h Handler, metrics *Metrics, logger *zap.Logger) (*Server, error) {
 	b := &backend{
 		config:  cfg,
 		handler: h,
+		metrics: metrics,
 		logger:  logger,
 	}
 

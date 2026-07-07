@@ -30,6 +30,8 @@ func NewService(sender *smsgate.Service, metrics *Metrics, logger *zap.Logger) *
 // The SMTP server has already validated the domain match.
 func (s *Service) Handle(ctx context.Context, email smtp.EmailData) error {
 	s.metrics.IncEmailsReceived()
+	defer s.metrics.InflightRequest()()
+	defer s.metrics.ObserveEmailProcessingDuration()()
 
 	if err := validatePhone(email.Phone); err != nil {
 		return err

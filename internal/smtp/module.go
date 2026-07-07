@@ -14,6 +14,7 @@ func Module() fx.Option {
 		"smtp",
 		logger.WithNamedLogger("smtp"),
 
+		fx.Provide(NewMetrics, fx.Private),
 		fx.Provide(NewServer),
 
 		fx.Invoke(func(lc fx.Lifecycle, server *Server, logger *zap.Logger) {

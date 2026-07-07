@@ -1,0 +1,67 @@
+groups:
+  - name: email-to-sms
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          rate(email2sms_bridge_sms_failed_total[5m])
+          /
+          (rate(email2sms_bridge_sms_sent_total[5m]) + rate(email2sms_bridge_sms_failed_total[5m]))
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SMS failure rate exceeds 5%"
+          description: "SMS failure rate is {{ $value | humanizePercentage }} over the last 5 minutes."
+
+      - alert: HighAuthFailureRate
+        expr: rate(email2sms_smsgate_auth_failed_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+          description: "SMSGate auth failures are at {{ $value | humanize }} per second over 5 minutes."
+
+      - alert: HighProcessingLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(email2sms_bridge_email_processing_duration_seconds_bucket[5m])) by (le)
+          ) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Email processing latency P99 exceeds 5s"
+          description: "P99 processing latency is {{ $value | humanizeDuration }}."
+
+      - alert: HighUpstreamLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(email2sms_smsgate_api_duration_seconds_bucket[5m])) by (le)
+          ) > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SMSGate API latency P99 exceeds 3s"
+          description: "SMSGate API P99 latency is {{ $value | humanizeDuration }}."
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="email-to-sms"} > 524288000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory usage exceeds 500 MiB"
+          description: "Resident memory is {{ $value | humanize1024 }}."
+
+      - alert: ServiceDown
+        expr: up{job="email-to-sms"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "The email-to-sms service has been unreachable for over 1 minute."

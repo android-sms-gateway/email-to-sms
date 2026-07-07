@@ -66,11 +66,14 @@ func (s *Service) Send(ctx context.Context, phone, message, username, password s
 		opts = append(opts, smsgateway.WithSkipPhoneValidation(true))
 	}
 
+	start := time.Now()
 	if _, err := client.Send(ctx, msg, opts...); err != nil {
+		elapsed := time.Since(start).Seconds()
 		s.logger.Error("SMSGate send failed", zap.Error(err))
-		return s.mapError(err)
+		return s.mapError(err, elapsed)
 	}
 
+	s.metrics.ObserveAPIDuration(time.Since(start).Seconds(), "none")
 	s.metrics.IncSent()
 	return nil
 }
@@ -86,13 +89,15 @@ func (s *Service) SendWithTimeout(
 }
 
 // mapError maps SMSGate client errors to module-specific sentinel errors.
-func (s *Service) mapError(err error) error {
+func (s *Service) mapError(err error, elapsed float64) error {
 	if isAuthFailure(err) {
 		s.metrics.IncAuthFailures()
+		s.metrics.ObserveAPIDuration(elapsed, "auth")
 		return ErrAuthenticationFailed
 	}
 
 	s.metrics.IncFailed()
+	s.metrics.ObserveAPIDuration(elapsed, "error")
 
 	switch {
 	case isTimeout(err):
