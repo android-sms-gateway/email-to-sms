@@ -1,5 +1,5 @@
 groups:
-  - name: email-to-sms
+  - name: email-to-sms:alerts
     interval: 30s
     rules:
       - alert: HighErrorRate
@@ -57,7 +57,7 @@ groups:
           summary: "Memory usage exceeds 500 MiB"
           description: "Resident memory is {{ $value | humanize1024 }}."
 
-      - alert: ServiceDown
+      - alert: EmailToSmsServiceDown
         expr: up{job="email-to-sms"} == 0
         for: 1m
         labels:
