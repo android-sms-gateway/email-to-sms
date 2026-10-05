@@ -1,282 +1,121 @@
-<a id="readme-top"></a>
+# 📱 Email-to-SMS Bridge
 
-<!-- PROJECT SHIELDS -->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
+[![Stars][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![Apache License][license-shield]][license-url]
-[![Go][go-shield]][go-url]
+[![License][license-shield]][license-url]
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/android-sms-gateway/email-to-sms">
-    <img src="https://raw.githubusercontent.com/golang-samples/gopher-vector/master/gopher.png" alt="Logo" width="120" height="120">
-  </a>
+An SMTP server that receives emails and forwards them as SMS messages through the SMSGate REST API. See [Email to SMS](https://docs.sms-gate.app/services/email-to-sms/) for the full guide.
 
-  <h3 align="center">Email-to-SMS Bridge</h3>
+## 📖 About
 
-  <p align="center">
-    SMTP server that receives emails and forwards them as SMS messages via the SMSGate Android gateway.
-    <br />
-    <a href="https://github.com/android-sms-gateway/email-to-sms"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/android-sms-gateway/email-to-sms/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/android-sms-gateway/email-to-sms/issues">Request Feature</a>
-  </p>
-</div>
+The Email-to-SMS Bridge lets any existing email-based notification system send SMS with zero code changes: applications send email to `phone@smtp-domain`, and the bridge forwards the message body to the SMSGate API using the SMTP AUTH credentials passed through for authentication.
 
+## 📚 Table of Contents
 
+- [📖 About](#-about)
+- [📚 Table of Contents](#-table-of-contents)
+- [⭐ Features](#-features)
+- [📦 Prerequisites](#-prerequisites)
+- [🚀 Getting Started](#-getting-started)
+- [⚙️ Configuration](#️-configuration)
+- [📦 Deployment](#-deployment)
+- [🔌 API Overview](#-api-overview)
+- [📚 Documentation](#-documentation)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
-<!-- TABLE OF CONTENTS -->
-- [About The Project](#about-the-project)
-  - [Use Case](#use-case)
-  - [Built With](#built-with)
-- [Getting Started](#getting-started)
-  - [Pre-built binaries (GitHub Releases)](#pre-built-binaries-github-releases)
-  - [Docker (GHCR)](#docker-ghcr)
-  - [Building from source](#building-from-source)
-  - [Development](#development)
-- [Usage](#usage)
-  - [Sending SMS via email](#sending-sms-via-email)
-  - [Configuration](#configuration)
-  - [SMTP Authentication](#smtp-authentication)
-  - [Monitoring](#monitoring)
-  - [Docker](#docker)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-- [Acknowledgments](#acknowledgments)
+## ⭐ Features
 
+- SMTP server with `AUTH PLAIN` and optional STARTTLS
+- Recipient-domain validation and phone number extraction from the local part
+- Credentials passed through to SMSGate for per-user authentication
+- Prometheus metrics (emails received, SMS sent/failed, auth failures)
+- HTTP API with Swagger/OpenAPI docs
 
+## 📦 Prerequisites
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+- Go 1.25+ for building from source
+- An SMSGate account
+- SMTP client that supports `AUTH PLAIN` (most email systems)
 
-The Email-to-SMS Bridge is a standalone SMTP server that receives emails and forwards them as SMS messages via the [SMSGate](https://sms-gate.app) Android gateway. Built with Go, it uses [go-smtp](https://github.com/emersion/go-smtp) for SMTP, [Fiber](https://gofiber.io/) for HTTP API, [Prometheus](https://prometheus.io/) for metrics, and [uber-go/fx](https://uber-go.github.io/fx/) for dependency injection.
+## 🚀 Getting Started
 
-This service acts as a bridge between email-based notification systems and SMS delivery, allowing booking systems, appointment schedulers, and other applications to send SMS notifications through a simple email interface.
-
-### Use Case
-
-Applications that already send email notifications can easily add SMS delivery by sending emails to this bridge:
-
-```
-Booking System → Email → Email-to-SMS Bridge → SMSGate → Android Device → SMS
+```bash
+make build
+SMTP__DOMAIN=sms-gateway.local ./bin/email-to-sms
 ```
 
-Emails are sent in the format: `79991234567@sms-gateway.local`
+Send an email to `79991234567@sms-gateway.local`; the message body becomes the SMS text.
 
-- **Local part (before @):** Phone number in any format
-- **Body:** SMS message content
-- **Authentication:** SMTP AUTH credentials are passed through to SMSGate for per-user authentication
+## ⚙️ Configuration
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+Configuration is loaded from environment variables (double-underscore nesting) or an optional YAML file via `CONFIG_PATH`.
 
+| Variable                     | Default                                | Description                                   |
+| ---------------------------- | -------------------------------------- | --------------------------------------------- |
+| `HTTP__ADDRESS`              | `127.0.0.1:3000`                       | HTTP API listen address                       |
+| `HTTP__OPENAPI__ENABLED`     | `true`                                 | Enable Swagger UI at `/api/v1/docs`           |
+| `SMTP__HOST`                 | `127.0.0.1`                            | SMTP listen address                           |
+| `SMTP__PORT`                 | `587`                                  | SMTP port                                     |
+| `SMTP__DOMAIN`               | `example.com`                          | Allowed recipient domain                      |
+| `SMTP__TLS_CERT`             | *(empty)*                              | TLS cert path (STARTTLS)                      |
+| `SMTP__TLS_KEY`              | *(empty)*                              | TLS key path                                  |
+| `SMSGATE__URL`               | `https://api.sms-gate.app/3rdparty/v1` | SMSGate API base URL                          |
+| `SMSGATE__SKIP_PHONE_VALIDATION` | `false`                            | Skip phone number validation                  |
+| `CONFIG_PATH`                | *(empty)*                              | Optional YAML config file path                |
 
-### Built With
+Full reference: [Email to SMS](https://docs.sms-gate.app/services/email-to-sms/).
 
-* [![Go][go-shield]][go-url]
-* [go-smtp](https://github.com/emersion/go-smtp) — SMTP server library
-* [SMSGate client-go](https://github.com/android-sms-gateway/client-go) — SMS gateway API client
-* [Fiber](https://gofiber.io/) — HTTP framework
-* [uber-go/fx](https://uber-go.github.io/fx/) — Dependency injection
-* [Prometheus](https://prometheus.io/) — Metrics and monitoring
-* [go-core-fx/config](https://github.com/go-core-fx/config) — Configuration management
+## 📦 Deployment
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- GETTING STARTED -->
-## Getting Started
-
-### Pre-built binaries (GitHub Releases)
-
-Download the latest binary for your platform from the [Releases page](https://github.com/android-sms-gateway/email-to-sms/releases).
-
-```sh
-# Example: Linux amd64
-curl -LO https://github.com/android-sms-gateway/email-to-sms/releases/latest/download/email-to-sms_linux_amd64.tar.gz
-tar xzf email-to-sms_linux_amd64.tar.gz
-
-# Run
-SMTP__DOMAIN=sms-gateway.local ./email-to-sms
-```
-
-### Docker (GHCR)
-
-```sh
-docker pull ghcr.io/android-sms-gateway/email-to-sms:latest
-
-docker run -d \
+```bash
+docker run -d --name email-to-sms \
   -e SMTP__DOMAIN=sms-gateway.local \
+  -e SMTP__HOST=0.0.0.0 \
   -e SMTP__PORT=2525 \
+  -e HTTP__ADDRESS=0.0.0.0:3000 \
   -p 2525:2525 \
+  -p 3000:3000 \
   ghcr.io/android-sms-gateway/email-to-sms:latest
 ```
 
-### Building from source
+> **Note:** SMTP `AUTH PLAIN` is accepted before STARTTLS, so credentials cross the published port in cleartext. On untrusted networks, restrict the published port (e.g. `-p 127.0.0.1:2525:2525`) or terminate TLS in front of the container.
 
-```sh
-git clone https://github.com/android-sms-gateway/email-to-sms.git
-cd email-to-sms
-make build
-```
+## 🔌 API Overview
 
-Requires Go 1.25+ (see `go.mod`). The binary will be placed in `bin/email-to-sms`.
+| Method | Path              | Description                                   |
+| ------ | ----------------- | --------------------------------------------- |
+| GET    | `/health`         | Liveness probe (same as `/health/live`)       |
+| GET    | `/health/live`    | Liveness probe                                |
+| GET    | `/health/ready`   | Readiness probe                               |
+| GET    | `/health/startup` | Startup probe                                 |
+| GET    | `/metrics`        | Prometheus metrics                            |
+| GET    | `/api/v1/docs`    | Swagger/OpenAPI documentation                 |
 
-### Development
+## 📚 Documentation
 
-```sh
-# Install Air for live reload
-go install github.com/air-verse/air@latest
+- [Email to SMS](https://docs.sms-gate.app/services/email-to-sms/)
+- [SMTP integration](https://docs.sms-gate.app/integration/smtp/)
+- [Central docs](https://docs.sms-gate.app/)
 
-# Start dev server with hot reload
-make air
-```
+## 🤝 Contributing
 
-See the [Makefile](./Makefile) for all available targets (`make help`).
+Contributions are welcome. Open an issue or pull request; follow the repo's `make fmt` / `make lint` / `make test` checks and the [README style guide](https://docs.sms-gate.app/).
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+## 📄 License
 
+Apache-2.0. See [LICENSE](LICENSE).
 
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-### Sending SMS via email
-
-Send an email where the recipient address contains the phone number:
-
-```
-To: 79991234567@sms-gateway.local
-Subject: (ignored)
-Body: Your appointment is confirmed for tomorrow at 10:00 AM.
-```
-
-### Configuration
-
-The application is configured via environment variables (double-underscore for nesting) or a YAML file specified by `CONFIG_PATH`.
-
-| Variable                         | Default                                | Description                         |
-| -------------------------------- | -------------------------------------- | ----------------------------------- |
-| `HTTP__ADDRESS`                  | `127.0.0.1:3000`                       | HTTP API listen address             |
-| `HTTP__OPENAPI__ENABLED`         | `true`                                 | Enable Swagger UI at `/api/v1/docs` |
-| `SMTP__HOST`                     | `127.0.0.1`                            | SMTP listen address                 |
-| `SMTP__PORT`                     | `587`                                  | SMTP port                           |
-| `SMTP__DOMAIN`                   | `example.com`                          | Allowed domain for email recipients |
-| `SMTP__TLS_CERT`                 | `""`                                   | Path to TLS certificate (optional)  |
-| `SMTP__TLS_KEY`                  | `""`                                   | Path to TLS key (optional)          |
-| `SMSGATE__URL`                   | `https://api.sms-gate.app/3rdparty/v1` | SMSGate API base URL                |
-| `SMSGATE__SKIP_PHONE_VALIDATION` | `false`                                | Skip phone validation on SMSGate    |
-
-### SMTP Authentication
-
-SMTP AUTH PLAIN credentials are passed through to SMSGate for per-user authentication.
-
-### Monitoring
-
-Prometheus metrics are exposed on the HTTP server at `/metrics`:
-
-- `email2sms_bridge_emails_received_total` — Emails received by the SMTP server
-- `email2sms_smsgate_sms_sent_total` — Successful SMS sends
-- `email2sms_smsgate_sms_failed_total` — Failed SMS sends
-- `email2sms_smsgate_auth_failures_total` — Authentication failures
-
-### Docker
-
-```sh
-make docker-build
-```
-
-A production Docker image is also built via GoReleaser on every release.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Project initialization
-- [x] SMTP server implementation (AUTH PLAIN, TLS, domain validation)
-- [x] Email parsing (MIME, phone extraction)
-- [x] SMS sending via SMSGate API
-- [x] Prometheus metrics
-- [x] HTTP API with Swagger docs
-- [x] Docker support (multi-arch)
-- [ ] Unit and integration tests
-- [ ] Helm chart for Kubernetes deployment
-
-See the [open issues](https://github.com/android-sms-gateway/email-to-sms/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- LICENSE -->
-## License
-
-Distributed under the Apache 2.0 License. See `LICENSE` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- CONTACT -->
-## Contact
-
-Maintainer: [@capcom6](https://github.com/capcom6)
-
-Project Link: [https://github.com/android-sms-gateway/email-to-sms](https://github.com/android-sms-gateway/email-to-sms)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-* [Go](https://go.dev/)
-* [Shields.io](https://shields.io)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+<!-- Reference-style badge URLs: style=for-the-badge is mandatory -->
+[contributors-shield]: https://img.shields.io/github/contributors/android-sms-gateway/email-to-sms?style=for-the-badge
 [contributors-url]: https://github.com/android-sms-gateway/email-to-sms/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/android-sms-gateway/email-to-sms?style=for-the-badge
 [forks-url]: https://github.com/android-sms-gateway/email-to-sms/network/members
-[stars-shield]: https://img.shields.io/github/stars/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/android-sms-gateway/email-to-sms?style=for-the-badge
 [stars-url]: https://github.com/android-sms-gateway/email-to-sms/stargazers
-[issues-shield]: https://img.shields.io/github/issues/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/android-sms-gateway/email-to-sms?style=for-the-badge
 [issues-url]: https://github.com/android-sms-gateway/email-to-sms/issues
-[license-shield]: https://img.shields.io/github/license/android-sms-gateway/email-to-sms.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/android-sms-gateway/email-to-sms?style=for-the-badge
 [license-url]: https://github.com/android-sms-gateway/email-to-sms/blob/master/LICENSE
-[go-shield]: https://img.shields.io/badge/go-1.25%2B-00ADD8?style=for-the-badge&logo=go
-[go-url]: https://go.dev/
