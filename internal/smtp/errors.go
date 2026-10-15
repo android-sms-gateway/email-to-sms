@@ -3,6 +3,9 @@ package smtp
 import "errors"
 
 var (
+	// ErrIncompleteTLSConfig is returned when only one of the TLS certificate or key is configured.
+	ErrIncompleteTLSConfig = errors.New("TLS certificate and key must be configured together")
+
 	// ErrInvalidEmailFormat is returned when the recipient email address cannot be parsed.
 	ErrInvalidEmailFormat = errors.New("invalid email format")
 
