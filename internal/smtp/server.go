@@ -24,10 +24,15 @@ func NewServer(cfg Config, h Handler, metrics *Metrics, logger *zap.Logger) (*Se
 	}
 
 	srv := gosmtp.NewServer(b)
-	srv.AllowInsecureAuth = true
 	srv.Addr = fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 
-	if cfg.TLSCert != "" && cfg.TLSKey != "" {
+	tlsEnabled := cfg.TLSCert != "" && cfg.TLSKey != ""
+
+	// Cleartext AUTH is only permitted when TLS is not configured. With TLS
+	// enabled, credentials must be sent over an upgraded (STARTTLS) connection.
+	srv.AllowInsecureAuth = !tlsEnabled
+
+	if tlsEnabled {
 		cert, err := tls.LoadX509KeyPair(cfg.TLSCert, cfg.TLSKey)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load TLS certificate: %w", err)
