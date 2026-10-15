@@ -170,14 +170,16 @@ The application is configured via environment variables (double-underscore for n
 | `SMTP__HOST`                     | `127.0.0.1`                            | SMTP listen address                 |
 | `SMTP__PORT`                     | `587`                                  | SMTP port                           |
 | `SMTP__DOMAIN`                   | `example.com`                          | Allowed domain for email recipients |
-| `SMTP__TLS_CERT`                 | `""`                                   | Path to TLS certificate (optional)  |
-| `SMTP__TLS_KEY`                  | `""`                                   | Path to TLS key (optional)          |
+| `SMTP__TLS_CERT`                 | `""`                                   | TLS certificate; enables STARTTLS   |
+| `SMTP__TLS_KEY`                  | `""`                                   | TLS key; required for `AUTH`        |
 | `SMSGATE__URL`                   | `https://api.sms-gate.app/3rdparty/v1` | SMSGate API base URL                |
 | `SMSGATE__SKIP_PHONE_VALIDATION` | `false`                                | Skip phone validation on SMSGate    |
 
 ### SMTP Authentication
 
 SMTP AUTH PLAIN credentials are passed through to SMSGate for per-user authentication.
+
+When both `SMTP__TLS_CERT` and `SMTP__TLS_KEY` are configured, the server advertises STARTTLS and only offers `AUTH` after the connection is upgraded; a cleartext `AUTH PLAIN` is refused. Without TLS configured (for example the default local `127.0.0.1` setup), `AUTH PLAIN` is accepted over the plaintext connection — avoid this on untrusted networks.
 
 ### Monitoring
 
